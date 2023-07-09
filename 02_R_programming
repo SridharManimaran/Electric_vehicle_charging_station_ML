@@ -1,0 +1,177 @@
+#R program codes: 
+
+#Multiple Linear Regression: 
+
+# set working directory 
+
+setwd(dirname(file.choose())) 
+
+getwd() 
+
+# read in data from csv file 
+
+EV <- read.csv("Electric_charging_point_clean_Final.csv", stringsAsFactors = FALSE) 
+
+EV.1 <- data.frame(EV$connector1RatedOutputKW, EV$connector1OutputCurrent, EV$connector1RatedVoltage, 
+
+                   EV$connector1ChargeMode, EV$all_device, EV$per_population_all_device, 
+
+                   EV$rapid_device, EV$per_population_rapid_device) 
+
+colnames(EV.1) <- c("connector1RatedOutputKW", "connector1OutputCurrent", "connector1RatedVoltage", "connector1ChargeMode", 
+
+                    "all_device", "per_population_all_device", "rapid_device", "per_population_rapid_device") 
+
+head(EV.1) 
+
+pairs(EV.1, pch = 18, col = "steelblue") 
+
+library(GGally) 
+
+ggpairs(EV.1)   
+
+model <- lm(connector1OutputCurrent ~ connector1RatedVoltage + connector1RatedOutputKW + connector1ChargeMode, data = EV.1) 
+
+hist(residuals(model), col = "steelblue") 
+
+#create fitted value vs residual plot 
+
+plot(fitted(model), residuals(model)) 
+
+#add horizontal line at 0 
+
+abline(h = 0, lty = 2) 
+
+summary(model) 
+
+  
+
+#Decision Tree: 
+
+# set working directory 
+
+setwd(dirname(file.choose())) 
+
+getwd() 
+
+# read in data from csv file 
+
+EV <- read.csv("Electric_charging_point_clean_Final.csv", stringsAsFactors = FALSE) 
+
+EV.1 <- EV[ , c("connector1RatedOutputKW", "connector1OutputCurrent", "connector1RatedVoltage", "connector1ChargeMode", 
+
+                "all_device", "per_population_all_device", "rapid_device", "per_population_rapid_device")] 
+
+head(EV.1) 
+
+library(datasets) 
+
+library(caTools) 
+
+library(party) 
+
+library(dplyr) 
+
+library(magrittr) 
+
+sample_data = sample.split(EV.1, SplitRatio = 0.8) 
+
+train_data <- subset(EV.1, sample_data == TRUE) 
+
+test_data <- subset(EV.1, sample_data == FALSE) 
+
+model<- ctree(connector1OutputCurrent ~ ., train_data) 
+
+plot(model) 
+
+predict_model<-predict(model, test_data) 
+
+m_at <- table(test_data$connector1OutputCurrent, predict_model) 
+
+m_at 
+
+#Random Forest: 
+
+# set working directory 
+
+setwd(dirname(file.choose())) 
+
+getwd() 
+
+# read in data from csv file 
+
+EV <- read.csv("Electric_charging_point_clean_Final.csv", stringsAsFactors = FALSE) 
+
+EV.1 <- EV[ , c("connector1RatedOutputKW", "connector1OutputCurrent", "connector1RatedVoltage", "connector1ChargeMode",  
+
+                "all_device", "per_population_all_device", "rapid_device", "per_population_rapid_device")] 
+
+head(EV.1) 
+
+library(randomForest) 
+
+#find number of rows with missing values 
+
+sum(!complete.cases(EV.1)) 
+
+#replace NAs with column medians 
+
+for(i in 1:ncol(EV.1)) { 
+
+  EV.1[ , i][is.na(EV.1[ , i])] <- median(EV.1[ , i], na.rm=TRUE) 
+
+} 
+
+#make this example reproducible 
+
+set.seed(1) 
+
+#fit the random forest model 
+
+model <- randomForest( 
+
+  formula = connector1OutputCurrent ~ ., 
+
+  data = EV.1 
+
+) 
+
+#display fitted model 
+
+model 
+
+#find number of trees that produce lowest test MSE 
+
+which.min(model$mse) 
+
+#find RMSE of best model 
+
+sqrt(model$mse[which.min(model$mse)])  
+
+#display test MSE by number of trees 
+
+plot(model) 
+
+#produce variable importance plot 
+
+varImpPlot(model)  
+
+#tune model 
+
+model_tuned <- tuneRF( 
+
+  x=EV.1[,-1], 
+
+  y=EV.1$connector1OutputCurrent, 
+
+  ntreeTry=500, 
+
+  mtryStart=4, 
+
+  stepFactor=1.5, 
+
+  improve=0.01, 
+
+  trace=FALSE #don't show real-time progress 
+
+) 
