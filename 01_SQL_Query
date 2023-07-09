@@ -1,0 +1,21 @@
+SELECT ID, name, latitude, longitude, thoroughfare, town, county, postcode,  
+
+chargeDeviceStatus, dateCreated, dateUpdated, lastUpdated, locationType, access24Hours, 
+
+connector1Type, connector1RatedOutputKW, connector1OutputCurrent, connector1RatedVoltage, connector1ChargeMethod, connector1ChargeMode, 
+
+connector2Type, connector2RatedOutputKW, connector2OutputCurrent, connector2RatedVoltage, connector2ChargeMethod, connector2ChargeMode 
+
+FROM Electric_charging_point 
+
+WHERE county IN ('City of London', 'City of Westminster', 'Greater London', 'Hammersimth & Fulham Council', 
+
+'Islington Council', 'London', 'London Borough of Camden', 'London Borough of Ealing', 'London Borough of Enfield',  
+
+'London Borough of Greenwich', 'London Borough of Hackney', 'London Borough of Hammersimth and Fulham',  
+
+'London Borough of Hounslow', 'London Borough of Islington', 'London Borough of Lambeth', 'London Borough of Richmond upon Thames', 
+
+'London Borough of Southwark', 'London Borough of Waltham Forest', 'London Borough of Wandsworth', 'Richmond upon Thames Council', 
+
+'Royal Borough of Greenwich', 'Royal Borough of Kensington and chelsea', 'Wandsworth Council') AND chargeDeviceStatus = 'In service'; 
